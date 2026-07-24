@@ -1,0 +1,43 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  role         String    @default("CANDIDATE")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  candidate    Candidate?
+}
+
+model Candidate {
+  id               String    @id @default(uuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name             String
+  rollNumber       String    @unique
+  branch           String
+  category         String
+  btechPercentage  Float
+  age              Int
+  status           String    @default("APPLIED")
+  isVerified       Boolean   @default(false)
+  digiLockerRefId  String?
+  writtenScore     Float
+  gdScore          Float?
+  piScore          Float?
+  finalTotalScore  Float?
+  offerExtendedAt  DateTime?
+  offerExpiresAt   DateTime?
+
+  @@index([branch, category, finalTotalScore])
+  @@index([rollNumber])
+}
